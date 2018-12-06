@@ -633,6 +633,625 @@ We return to the discussion of general valued fields. We are now going to introd
 \end{defi}
 Here we use the conventions that $r + \infty = \infty$ and $r \leq \infty$ for all $r \in \infty$.
 
+In some sense, this definitions, and they are ubiquitous in modern algebraic number theory and arithmetic geometry.
+
+Topics likely to be covered include:
+\begin{itemize}[label={}]
+  \item The $p$-adic numbers. Local fields and their structure.
+  \item Finite extensions, Galois theory and basic ramification theory.
+  \item Polynomial equations; Hensel's Lemma, Newton polygons.
+  \item Continuous functions on the $p$-adic integers, Mahler's Theorem.
+  \item Local class field theory (time permitting).
+\end{itemize}
+
+\subsubsection*{Pre-requisites}
+Basic algebra, including Galois theory, and basic concepts from point set topology and metric spaces. Some prior exposure to number fields might be useful, but is not essential.
+
+\tableofcontents
+\setcounter{section}{-1}
+\section{Introduction}
+What are local fields? Suppose we are interested in some basic number theoretic problem. Say we have a polynomial $f(x_1, \cdots, x_n) \in \Z[x_1, \cdots, x_n]$. We want to look for solutions $\mathbf{a} \in \Z^n$, or show that there are no solutions at all. We might try to view this polynomial as a real polynomial, look at its roots, and see if they are integers. In lucky cases, we might be able to show that there are no real solutions at all, and conclude that there cannot be any solutions at all.
+
+On the other hand, we can try to look at it modulo some prime $p$. If there are no solutions mod $p$, then there cannot be any solution. But sometimes $p$ is not enough. We might want to look at it mod $p^2$, or $p^3$, or \ldots. One important application of local fields is that we can package all these information together. In this course, we are not going to study the number theoretic problems, but just look at the properties of the local fields for their own sake.
+
+Throughout this course, all rings will be commutative with unity, unless otherwise specified.
+\section{Basic theory}
+We are going to start by making loads of definitions, which you may or may not have seen before.
+
+\subsection{Fields}
+
+\begin{defi}[Absolute value]\index{absolute value}
+  Let $K$ be a field. An \emph{absolute value} on $K$ is a function $|\ph|: K \to \R_{\geq 0}$ such that
+  \begin{enumerate}
+    \item $|x| = 0$ iff $x = 0$;
+    \item $|xy| = |x||y|$ for all $x, y \in K$;
+    \item $|x + y| \leq |x| + |y|$.\index{triangle inequality}
+  \end{enumerate}
+\end{defi}
+
+\begin{defi}[Valued field]\index{valued field}
+  A \emph{valued field} is a field with an absolute value.
+\end{defi}
+
+\begin{eg}
+  The rationals, reals and complex numbers with the usual absolute values are absolute values.
+\end{eg}
+
+\begin{eg}[Trivial absolute value]
+  The \emph{trivial absolute value}\index{trivial absolute value} on a field $K$ is the absolute value given by
+  \[
+    |x| =
+    \begin{cases}
+      1 & x \not= 0\\
+      0 & x = 0
+    \end{cases}.
+  \]
+\end{eg}
+The only reason why we mention the trivial absolute value here is that from now on, we will assume that the absolute values are \emph{not} trivial, because trivial absolute values are boring and break things.
+
+There are some familiar basic properties of the absolute value such as
+\begin{prop}
+  $||x| - |y|| \leq |x - y|$. Here the outer absolute value on the left hand side is the usual absolute value of $\R$, while the others are the absolute values of the relevant field.
+\end{prop}
+
+An absolute value defines a metric $d(x, y) = |x - y|$ on $K$.
+
+\begin{defi}[Equivalence of absolute values]\index{absolute values!equivalence}\index{equivalent absolute values}
+  Let $K$ be a field, and let $|\ph|, |\ph|'$ be absolute values. We say they are \emph{equivalent} if they induce the same topology.
+\end{defi}
+
+\begin{prop}
+  Let $K$ be a field, and $|\ph|, |\ph|'$ be absolute values on $K$. Then the following are equivalent.
+  \begin{enumerate}
+    \item $|\ph|$ and $|\ph|'$ are equivalent
+    \item $|x| < 1$ implies $|x|' < 1$ for all $x \in K$
+    \item There is some $s \in \R_{> 0}$ such that $|x|^s = |x|'$ for all $x \in K$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+% \begin{itemize}
+% \item (i) $\Rightarrow$ (ii): Suppose we have $|x| < 1$. Then the sequence $x^n$ converges to $0$ as $n \to \infty$ under $|\ph|$. So $x^n$ also converges under $|\ph|'$. So $(|x|')^n = |x^n|' \to 0$. So $|x|' < 1$.
+% \item (ii) $\Rightarrow$ (iii): Pick an arbitrary $x$ with $|x| < 1$. This exists since the norm is non-trivial, and if $|x| > 1$, then $|x^{-1}| < 1$. Let $s$ be such that $|x|^s = |x|'$. Let $y$ be any other number with $|y|^t = |y|'$. Suppose $t \not= s$, say $t > s$.
+%
+% \item (iii) $\Rightarrow$ (ii) is obvious.
+% \end{itemize}
+  Exercise
+\end{proof}
+
+\begin{ex}
+  Let $K$ be a valued field. Then equivalent absolute values induce the same the \emph{completion} $\hat{K}$ of $K$, and $\hat{K}$ is a valued field with an absolute value extending $|\ph|$.
+\end{ex}
+
+In this course, we are not going to be interested in the usual absolute values. Instead, we are going to consider some really weird ones, namely \emph{non-archimedean} ones.
+\begin{defi}[Non-archimedean absolute value]\index{non-archimedean absolute value}\index{absolute value!non-archimedean}\index{archimedean absolute value}\index{absolute value!archimedean}
+  An absolute value $|\ph|$ on a field $K$ is called \emph{non-archimedean} if $|x + y| \leq \max(|x|, |y|)$. This condition is called the \emph{strong triangle inequality}\index{strong triangle inequality}.
+
+  An absolute value which isn't non-archimedean is called \emph{archimedean}.
+\end{defi}
+Metrics satisfying $d(x, z) \leq \max(d(x, y), d(y, z))$ are often known as \emph{ultrametrics}\index{ultrametric}.
+
+\begin{eg}
+  $\Q$, $\R$ and $\C$ under the usual absolute values are archimedean.
+\end{eg}
+
+In this course, we will only consider non-archimedean absolute values. Thus, from now on, unless otherwise mentioned, an absolute value is assumed to be non-archimedean. The metric is weird!
+
+We start by proving some absurd properties of non-archimedean absolute values.
+
+Recall that the closed balls are defined by
+\[
+  B(x, r) = \{y: |x - y| \leq r\}.
+\]
+\begin{prop}
+  Let $(K, |\ph|)$ be a non-archimedean valued field, and let $x \in K$ and $r \in \R_{> 0}$. Let $z \in B(x, r)$. Then
+  \[
+    B(x, r) = B(z, r).
+  \]
+\end{prop}
+So closed balls do not have unique ``centers''. Every point can be viewed as the center.
+
+\begin{proof}
+  Let $y \in B(z, r)$. Then
+  \[
+    |x - y| = |(x - z) + (z - y)| \leq \max(|x - z|, |z - y|) \leq r.
+  \]
+  So $y \in B(x, r)$. By symmetry, $y \in B(x, r)$ implies $y \in B(z, r)$.
+\end{proof}
+
+\begin{cor}
+  Closed balls are open.
+\end{cor}
+
+\begin{proof}
+  To show that $B(x, r)$ is open, we let $z \in B(x, r)$. Then we have
+  \[
+    \{y: |y - z| < r\} \subseteq B(z, r) = B(x, r).
+  \]
+  So we know the open ball of radius $r$ around $z$ is contained in $B(x, r)$. So $B(x, r)$ is open.
+\end{proof}
+
+Norms in non-archimedean valued fields are easy to compute:
+\begin{prop}
+  Let $K$ be a non-archimedean valued field, and $x, y \in K$. If $|x| > |y|$, then $|x + y| = |x|$.
+
+  More generally, if $x = \sum_{c = 0}^\infty x_i$ and the non-zero $|x_i|$ are distinct, then $|x| = \max |x_i|$.
+\end{prop}
+
+\begin{proof}
+  On the one hand, we have $|x + y| \leq \max\{|x|, |y|\}$. On the other hand, we have
+  \[
+    |x| = |(x + y) - y| \leq \max(|x + y|, |y|) = |x + y|,
+  \]
+  since we know that we cannot have $|x| \leq |y|$. So we must have $|x| = |x + y|$.
+\end{proof}
+
+Convergence is also easy for valued fields.
+\begin{prop}
+  Let $K$ be a valued field.
+  \begin{enumerate}
+    \item Let $(x_n)$ be a sequence in $K$. If $x_n - x_{n + 1} \to 0$, then $x_n$ is Cauchy.
+  \end{enumerate}
+  If we assume further that $K$ is complete, then
+  \begin{enumerate}[resume]
+    \item Let $(x_n)$ be a sequence in $K$. If $x_n - x_{n + 1} \to 0$, then a sequence $(x_n)$ in $K$ converges.
+    \item Let $\sum_{n = 0}^\infty y_n$ be a series in $K$. If $y_n \to 0$, then $\sum_{n = 0}^\infty y_n$ converges.
+  \end{enumerate}
+\end{prop}
+The converses to all these are of course also true, with the usual proofs.
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Pick $\varepsilon > 0$ and $N$ such that $|x_n - x_{n + 1}| < \varepsilon$ for all $n \geq N$. Then given $m\geq n \geq N$, we have
+      \begin{align*}
+        |x_m - x_n| &= |x_m - x_{m - 1} + x_{m - 1} - x_{m - 2} + \cdots - x_n| \\
+        &\leq \max(|x_m - x_{m - 1}|, \cdots, |x_{n + 1} - x_n|) \\
+        &< \varepsilon.
+      \end{align*}
+      So the sequence is Cauchy.
+    \item Follows from (1) and the definition of completeness.
+    \item Follows from the definition of convergence of a series and (2).
+  \end{enumerate}
+\end{proof}
+
+The reason why we care about these weird non-archimedean fields is that they have very rich \emph{algebraic} structure. In particular, there is this notion of the \emph{valuation ring}.
+
+\begin{defi}[Valuation ring]\index{valuation ring}
+   Let $K$ be a valued field. Then the \emph{valuation ring of K} is the open subring
+  \[
+    \mathcal{O}_K = \{x: |x| \leq 1\}.
+  \]
+\end{defi}
+
+We prove that it is actually a ring
+\begin{prop}
+  Let $K$ be a valued field. Then
+  \[
+    \mathcal{O}_K = \{x: |x| \leq 1\}
+  \]
+  is an open subring of $K$. Moreover, for each $r \in (0, 1]$, the subsets $\{x : |x| < r\}$ and $\{x: |x| \leq r\}$ are open ideals of $\mathcal{O}_K$. Moreover, $\mathcal{O}_K^\times = \{x : |x| = 1\}$.
+\end{prop}
+Note that this is very false for usual absolute values. For example, if we take $\R$ with the usual absolute value, we have $1 \in \mathcal{O}_\R$, but $1+ 1 \not\in \mathcal{O}_R$.
+
+\begin{proof}
+  We know that these sets are open since all balls are open.
+
+  To see $\mathcal{O}_K$ is a subring, we have $|1| = |-1| = 1$. So $1, -1 \in \mathcal{O}_K$. If $x, y \in \mathcal{O}_K$, then $|x + y| \leq \max(|x|, |y|) \leq 1$. So $x + y \in \mathcal{O}_K$. Also, $|xy| = |x||y| \leq 1 \cdot 1 = 1$. So $xy \in \mathcal{O}_K$.
+
+  That the other sets are ideals of $\mathcal{O}_K$ is checked in the same way.
+
+  To check the units, we have $x \in \mathcal{O}_K^\times \Leftrightarrow |x|, |x^{-1}| \leq 1 \Leftrightarrow |x| = |x|^{-1} = 1$.
+\end{proof}
+
+\subsection{Rings}
+
+\begin{defi}[Integral element]\index{integral element}
+  Let $R \subseteq S$ be rings and $s \in S$. We say $s$ is \emph{integral over $R$} if there is some monic $f \in R[x]$ such that $f(s) = 0$.
+\end{defi}
+
+\begin{eg}
+  Any $r \in R$ is integral (take $f(x) = x - r$).
+\end{eg}
+
+\begin{eg}
+  Take $\Z \subseteq \C$. Then $z \in \C$ is integral over $\Z$ if it is an \term{algebraic integer} (by definition of algebraic integer). For example, $\sqrt{2}$ is an algebraic integer, but $\frac{1}{\sqrt{2}}$ is not.
+\end{eg}
+
+We would like to prove the following characterization of integral elements:
+\begin{thm}
+  Let $R \subseteq S$ be rings. Then $s_1, \cdots, s_n \in S$ are all integral iff $R[s_1, \cdots, s_n] \subseteq S$ is a finitely-generated $R$-module.
+\end{thm}
+Note that $R[s_1, \cdots, s_n]$ is by definition a finitely-generated $R$-algebra, but requiring it to be finitely-generated as a module is stronger.
+
+Here one direction is easy. It is not hard to show that if $s_1, \cdots, s_n$ are all integral, then $R[s_1, \cdots, s_n]$ is finitely-generated. However to show the other direction, we need to find some clever trick to produce a \emph{monic} polynomial that kills the $s_i$.
+
+The trick we need is the adjugate matrix we know and love from IA Vectors and Matrices.
+
+\begin{defi}[Adjoint/Adjugate matrix]
+  Let $A = (a_{ij})$ be an $n \times n$ matrix with coefficients in a ring $R$. The \term{adjugate matrix} or \term{adjoint matrix} $A^* = (a_{ij}^*)$ of $A$ is defined by
+  \[
+    a_{ij}^* = (-1)^{i + j} \det (A_{ij}),
+  \]
+  where $A_{ij}$ is an $(n-1)\times (n-1)$ matrix obtained from $A$ by deleting the $i$th column and the $j$th row.
+\end{defi}
+
+As we know from IA, the following property holds for the adjugate matrix:
+\begin{prop}
+  For any $A$, we have $A^*A = AA^* = \det(A) I$, where $I$ is the identity matrix.
+\end{prop}
+
+With this, we can prove our claim:
+\begin{proof}[Proof of theorem]
+  Note that we can construct $R[s_1, \cdots, s_n]$ by a sequence
+  \[
+    R \subseteq R[s_1] \subseteq R[s_1, s_2] \subseteq \cdots \subseteq R[s_1, \cdots, s_n] \subseteq S,
+  \]
+  and each $s_i$ is integral over $R[s_1, \cdots, s_{n - 1}]$. Since the finite extension of a finite extension is still finite, it suffices to prove it for the case $n = 1$, and we write $s$ for $s_1$.
+
+  Suppose $f(x) \in R[x]$ is monic such that $f(s) = 0$. If $g(x) \in R[x]$, then there is some $q, r \in R[x]$ such that $g(x) = f(x)q(x) + r(x)$ with $\deg r < \deg f$. Then $g(s) = r(s)$. So any polynomial expression in $s$ can be written as a polynomial expression with degree less than $\deg f$. So $R[s]$ is generated by $1, s, \cdots, s^{\deg f - 1}$.
+
+  In the other direction, let $t_1, \cdots, t_d$ be $R$-module generators of $R[s_1, \cdots, s_n]$. We show that in fact any element of $R[s_1, \cdots, s_n]$ is integral over $R$. Consider any element $b \in R[s_1, \cdots, s_n]$. Then there is some $a_{ij} \in R$ such that
+  \[
+    b t_i = \sum_{j = 1}^d a_{ij} t_j.
+  \]
+  In matrix form, this says
+  \[
+    (bI - A)t = 0.
+  \]
+  We now multiply by $(bI - A)^*$ to obtain
+  \[
+    \det(bI - A) t_j = 0
+  \]
+  for all $j$. Now we know $1 \in R$. So $1 = \sum c_j t_j$ for some $c_j \in R$. Then we have
+  \[
+    \det(bI - A) = \det(bI - A) \sum c_j t_j = \sum c_j (\det (bI - A) t_j) = 0.
+  \]
+  Since $\det(bI - A)$ is a monic polynomial in $b$, it follows that $b$ is integral.
+\end{proof}
+
+Using this characterization, the following result is obvious:
+\begin{cor}
+  Let $R \subseteq S$ be rings. If $s_1, s_2 \in S$ are integral over $R$, then $s_1 + s_2$ and $s_1s_2$ are integral over $R$. In particular, the set $\tilde{R} \subseteq S$ of all elements in $S$ integral over $R$ is a ring, known as the integral closure of $R$ in $S$.
+\end{cor}
+
+\begin{proof}
+  If $s_1, s_2$ are integral, then $R[s_1, s_2]$ is a finite extension over $R$. Since $s_1 + s_2$ and $s_1s_2$ are elements of $R[s_1, s_2]$, they are also integral over $R$.
+\end{proof}
+
+\begin{defi}[Integrally closed]
+  Given a ring extension $R \subseteq S$, we say $R$ is \term{integrally closed} in $S$ if $\tilde{R} = R$.
+\end{defi}
+
+\subsection{Topological rings}
+Recall that we previously constructed the valuation ring $\mathcal{O}_K$. Since the valued field $K$ itself has a topology, the valuation ring inherits a subspace topology. This is in fact a ring topology.
+
+\begin{defi}[Topological ring]\index{topological ring}\index{ring topology}
+  Let $R$ be a ring. A topology on $R$ is called a \emph{ring topology} if addition and multiplication are continuous maps $R \times R \to R$. A ring with a ring topology is a \emph{topological ring}.
+\end{defi}
+
+\begin{eg}
+  $\R$ and $\C$ with the usual topologies and usual ring structures are topological rings.
+\end{eg}
+
+\begin{ex}
+  Let $K$ be a valued field. Then $K$ is a topological ring. We can see this from the fact that the product topology on $K \times K$ is induced by the metric $d((x_0, y_0), (x_1, y_1)) = \max(|x_0 - x_1|, |y_0 - y_1|)$.
+\end{ex}
+
+Now if we are just randomly given a ring, there is a general way of constructing a ring topology. The idea is that we pick an ideal $I$ and declare its elements to be small. For example, in a valued ring, we can pick $I = \{x \in \mathcal{O}_K: |x| < 1\}$. Now if you are not only in $I$, but $I^2$, then you are even smaller. So we have a hierarchy of small sets
+\[
+  I \supseteq I^2 \supseteq I^3 \supseteq I^4 \supseteq\cdots
+\]
+Now to make this a topology on $R$, we say that a subset $U \subseteq R$ is open if every $x \in U$ is contained in some translation of $I^n$ (for some $n$). In other words, we need some $y \in R$ such that
+\[
+  x \in y + I^n \subseteq U.
+\]
+But since $I^n$ is additively closed, this is equivalent to saying $x + I^n \subseteq U$. So we make the following definition:
+
+\begin{defi}[$I$-adically open]\index{$I$-adically open}
+  Let $R$ be a ring and $I \subseteq R$ an ideal. A subset $U \subseteq R$ is called \emph{$I$-adically open} if for all $x \in U$, there is some $n \geq 1$ such that $x + I^n \subseteq U$.
+\end{defi}
+
+\begin{prop}
+  The set of all $I$-adically open sets form a topology on $R$, called the \term{$I$-adic topology}.
+\end{prop}
+Note that the $I$-adic topology isn't really the kind of topology we are used to thinking about, just like the topology on a valued field is also very weird. Instead, it is a ``filter'' for telling us how small things are.
+
+\begin{proof}
+  By definition, we have $\emptyset$ and $R$ are open, and arbitrary unions are clearly open. If $U, V$ are $I$-adically open, and $x \in U \cap V$, then there are $n, m$ such that $x + I^n \subseteq U$ and $x + I^m \subseteq V$. Then $x + I^{\max(m, n)} \subseteq U \cap V$.
+\end{proof}
+
+\begin{ex}
+  Check that the $I$-adic topology is a ring topology.
+\end{ex}
+
+In the special case where $I = xR$, we often call the $I$-adic topology the \term{$x$-adic topology}.
+
+Now we want to tackle the notion of completeness. We will consider the case of $I = xR$ for motivation, but the actual definition will be completely general.
+
+If we pick the $x$-adic topology, then we are essentially declaring that we take $x$ to be small. So intuitively, we would expect power series like
+\[
+  a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots
+\]
+to ``converge'', at least if the $a_i$ are ``of bounded size''. In general, the $a_i$ are ``not too big'' if $a_ix^i$ is genuinely a member of $x^i R$, as opposed to some silly thing like $x^{-i}$.
+
+As in the case of analysis, we would like to think of these infinite series as a sequence of partial sums
+\[
+  (a_0,\; a_0 + a_1 x,\; a_0 + a_1 x + a_2 x^2,\; \cdots)
+\]
+Now if we denote the limit as $L$, then we can think of this sequence alternatively as
+\[
+  (L \bmod I,\; L \bmod I^2,\; L \bmod I^3,\; \cdots).
+\]
+The key property of this sequence is that if we take $L \bmod I^k$ and reduce it mod $I^{k - 1}$, then we obtain $L \bmod I^{k - 1}$.
+
+In general, suppose we have a sequence
+\[
+  (b_n \in R/I^n)_{n = 1}^\infty.
+\]
+such that $b_n \bmod I^{n - 1} = b_{n - 1}$. Then we want to say that the ring is \emph{$I$-adically complete} if every sequence satisfying this property is actually of the form
+\[
+  (L \bmod I,\; L \bmod I^2,\; L \bmod I^3,\; \cdots)
+\]
+for some $L$. Alternatively, we can take the \emph{$I$-adic completion} to be the collection of all such sequences, and then a space is $I$-adically complete it is isomorphic to its $I$-adic completion.
+
+To do this, we need to build up some technical machinery. The kind of sequences we've just mentioned is a special case of an inverse limit.
+\begin{defi}[Inverse/projective limit]\index{inverse limit}\index{projective limit}
+  Let $R_1, R_2,, \cdots$ be topological rings, with continuous homomorphisms $f_n: R_{n + 1} \to R_n$.
+  \[
+    \begin{tikzcd}
+      R_1 & R_2 \ar[l, "f_1"] & R_3 \ar[l, "f_2"] & R_4 \ar[l, "f_3"] & \ar[l] \cdots
+    \end{tikzcd}
+  \]
+  The \emph{inverse limit} or \emph{projective limit} of the $R_i$ is the ring
+  \[
+    \varprojlim R_n = \left\{(x_n) \in \prod_n R_n : f_n(x_{n + 1}) = x_n\right\},
+  \]
+  with coordinate-wise addition and multiplication, together with the subspace topology coming from the product topology of $\prod R_n$. This topology is known as the \term{inverse limit topology}.
+\end{defi}
+
+\begin{prop}
+  The inverse limit topology is a ring topology.
+\end{prop}
+
+\begin{proof}[Proof sketch]
+  We can fit the addition and multiplication maps into diagrams
+  \[
+    \begin{tikzcd}
+      \varprojlim R_n \times \varprojlim R_n \ar[r] & \varprojlim R_n\\
+      \prod R_n \times \prod R_n \ar[u, hook] \ar[r] & \prod R_n \ar[u, hook]
+    \end{tikzcd}
+  \]
+  By the definition of the subspace topology, it suffices to show that the corresponding maps on $\prod R_n$ are continuous. By the universal property of the product, it suffices to show that the projects $\prod R_n \times \prod R_n \to R_m$ is continuous for all $m$. But this map can alternatively be obtained by first projecting to $R_m$, then doing multiplication in $R_m$, and projection is continuous. So the result follows.
+\end{proof}
+
+It is easy to see the following universal property of the inverse limit topology:
+\begin{prop}
+  Giving a continuous ring homomorphism $g: S \to \varprojlim R_n$ is the same as giving a continuous ring homomorphism $g_n: S \to R_n$ for each $n$, such that each of the following diagram commutes:
+  \[
+    \begin{tikzcd}
+      S \ar[r, "g_n"] \ar[rd, "g_{n - 1}"'] & R_n \ar[d, "f_{n - 1}"]\\
+      & R_{n - 1}
+    \end{tikzcd}
+  \]
+\end{prop}
+\begin{defi}[$I$-adic completion]
+  Let $R$ be a ring and $I$ be an ideal. The \term{$I$-adic completion} of $R$ is the topological ring
+  \[
+    \varprojlim R/I^n,
+  \]
+  where $R/I^n$ has the discrete topology, and $R/I^{n + 1} \to R/I^n$ is the quotient map. There is an evident map
+  \begin{align*}
+    \nu: R &\to \varprojlim R/I^n\\
+    r &\mapsto (r \bmod I^n)_.
+  \end{align*}
+  This map is a continuous ring homomorphism if $R$ is given the $I$-adic topology.
+\end{defi}
+
+\begin{defi}[$I$-adically complete]\index{$I$-adically complete}
+  We say that $R$ is \emph{$I$-adically complete} if $\nu$ is a bijection.
+\end{defi}
+
+\begin{ex}
+  If $\nu$ is a bijection, then $\nu$ is in fact a homeomorphism.
+\end{ex}
+
+\subsection{The $p$-adic numbers}
+For the rest of this course, $p$ is going to be a prime number.
+
+We consider a particular case of valued fields, namely the $p$-adic numbers, and study some of its basic properties.
+
+Let $x \in \Q$ be non-zero. Then by uniqueness of factorization, we can write $x$ uniquely as
+\[
+  x =p^n \frac{a}{b},
+\]
+where $a, b, n \in \Z$, $b > 0$ and $a, b, p$ are pairwise coprime.
+
+\begin{defi}[$p$-adic absolute value]\index{$p$-adic absolute value}
+  The \emph{$p$-adic absolute value} on $\Q$ is the function $|\ph|_p: \Q \to \R_{\geq 0}$ given by
+  \[
+    |x|_p =
+    \begin{cases}
+      0 & x = 0\\
+      p^{-n} & x = p^n \frac{a}{b}\text{ as above}
+    \end{cases}.
+  \]
+\end{defi}
+
+\begin{prop}
+  The $p$-adic absolute value is an absolute value.
+\end{prop}
+
+\begin{proof}
+  It is clear that $|x|_p = 0$ iff $x = 0$.
+
+  Suppose we have
+  \[
+    x = p^n \frac{a}{b},\quad y = p^m \frac{c}{d}.
+  \]
+  We wlog $m \geq n$. Then we have
+  \[
+    |xy|_p = \left|p^{n + m}\frac{ac}{bd}\right| = p^{-m-n}|x|_p |y|_p.
+  \]
+  So this is multiplicative. Finally, we have
+  \[
+    |x + y|_p = \left|p^n \frac{ab + p^{m - n}cb}{bd}\right| \leq p^{-n} = \max(|x|_p, |y|_p).
+  \]
+  Note that we must have $bd$ coprime to $p$, but $ab + p^{m - n}cb$ need not be. However, any extra powers of $p$ could only decrease the absolute value, hence the above result.
+\end{proof}
+
+Note that if $x \in \Z$ is an integer, then $|x|_p = p^{-n}$ iff $p^n \mid\mid x$ (we say $p^n \mid\mid x$ if $p^n \mid x$ and $p^{n + 1} \nmid x$).
+
+\begin{defi}[$p$-adic numbers]\index{$p$-adic numbers}
+  The \emph{$p$-adic numbers} $\Q_p$ is the completion of $\Q$ with respect to $|\ph|_p$.
+\end{defi}
+
+\begin{defi}[$p$-adic integers]\index{$p$-adic integers}
+  The valuation ring
+  \[
+    \Z_p = \{x \in \Q_p: |x|_p \leq 1\}
+  \]
+  is the \emph{$p$-adic integers}.
+\end{defi}
+
+\begin{prop}
+  $\Z_p$ is the closure of $\Z$ inside $\Q_p$.
+\end{prop}
+
+\begin{proof}
+  If $x \in \Z$ is non-zero, then $x = p^na$ with $n \geq 0$. So $|x|_p \leq 1$. So $\Z \subseteq \Z_p$.
+
+  We now want to show that $\Z$ is dense in $\Z_p$. We know the set
+  \[
+    \Z_{(p)} = \{x \in \Q: |x|_p \leq 1\}
+  \]
+  is dense inside $\Z_p$, essentially by definition. So it suffices to show that $\Z$ is dense in $\Z_{(p)}$. We let $x \in \Z_{(p)} \setminus\{0\}$, say
+  \[
+    x = p^n \frac{a}{b},\quad n \geq 0.
+  \]
+  It suffices to find $x_i \in \Z$ such that $x_i \to \frac{1}{b}$. Then we have $p^n ax_i \to x$.
+
+  Since $(b, p) = 1$, we can find $x_i, y_i \in \Z$ such that $b x_i + p^i y_i = 1$ for all $i \geq 1$. So
+  \[
+    \left|x_i - \frac{1}{b}\right|_p = \left|\frac{1}{b}\right|_p |bx_i - 1|_p = |p^i y_i|_p \leq p^{-i} \to 0.
+  \]
+  So done.
+\end{proof}
+
+\begin{prop}
+  The non-zero ideals of $\Z_p$ are $p^n \Z_p$ for $n \geq 0$. Moreover,
+  \[
+    \frac{\Z}{p^n \Z} \cong \frac{\Z_p}{p^n \Z_p}.
+  \]
+\end{prop}
+
+\begin{proof}
+  Let $0 \not= I \subseteq \Z_p$ be an ideal, and pick $x \in I$ such that $|x|_p$ is maximal. This supremum exists and is attained because the possible values of the absolute values are discrete and bounded above. If $y \in I$, then by maximality, we have $|y|_p \leq |x|_p$. So we have $|yx^{-1}|_p \leq 1$. So $yx^{-1} \in \Z_p$, and this implies that $y = (yx^{-1})x \in x\Z_p$. So $I \subseteq x\Z_p$, and we obviously have $x\Z_p \subseteq I$. So we have $I = x\Z_p$.
+
+  Now if $x = p^n \frac{a}{b}$, then since $\frac{a}{b}$ is invertible in $\Z_p$, we have $x\Z_p = p^n \Z_p$. So $I = p^n \Z_p$.
+
+  To show the second part, consider the map
+  \[
+    f_n: \Z \to \frac{\Z_p}{p^n \Z_p}
+  \]
+  given by the inclusion map followed by quotienting. Now $p^n \Z_p = \{x : |x|_p \leq p^{-n}$. So we have
+  \[
+    \ker f_n = \{x \in \Z: |x|_p \leq p^{-n}\} = p^n \Z.
+  \]
+  Now since $\Z$ is dense in $\Z_p$, we know the image of $f_n$ is dense in $\Z_p/p^n \Z_p$. But $\Z_p/p^n \Z_p$ has the discrete topology. So $f_n$ is surjective. So $f_n$ induces an isomorphism $\Z/p^n Z \cong \Z_p/p^n \Z_p$.
+\end{proof}
+
+\begin{cor}
+  $\Z_p$ is a PID with a unique prime element $p$ (up to units).
+\end{cor}
+This is pretty much the point of the $p$-adic numbers --- there are a lot of primes in $\Z$, and by passing on to $\Z_p$, we are left with just one of them.
+
+\begin{prop}
+  The topology on $\Z$ induced by $|\ph|_p$ is the $p$-adic topology (ie. the $p\Z$-adic topology).
+\end{prop}
+
+\begin{proof}
+  Let $U \subseteq \Z$. By definition, $U$ is open wrt $|\ph|_p$ iff for all $x \in U$, there is an $n\in \N$ such that
+  \[
+    \{y \in \Z: |y - x|_p \leq p^{-n}\} \subseteq U.
+  \]
+  On the other hand, $U$ is open in the $p$-adic topology iff for all $x \in U$, there is some $n \geq 0$ such that $x + p^n \Z \subseteq U$. But we have
+  \[
+    \{y \in \Z: |y - x|_p \leq p^{-n}\} = x + p^n \Z.
+  \]
+  So done.
+\end{proof}
+
+\begin{prop}
+  $\Z_p$ is $p$-adically complete and is (isomorphic to) the $p$-adic completion of $\Z$.
+\end{prop}
+
+\begin{proof}
+  The second part follows from the first as follows: we have the maps
+  \[
+    \begin{tikzcd}
+      \Z_p \ar[r, "\nu"] & \varprojlim \Z_p/(p^n \Z_p) & \lim \Z/(p^n\Z) \ar[l, "(f_n)_n"']
+    \end{tikzcd}
+  \]
+  We know the map induced by $(f_n)_n$ is an isomorphism. So we just have to show that $\nu$ is an isomorphism
+
+  To prove the first part, we have $x \in \ker \nu$ iff $x \in p^n \Z_p$ for all $n$ iff $|x|_p \leq p^{-n}$ for all $n$ iff $|x|_p = 0$ iff $x = 0$. So the map is injective.
+
+  To show surjectivity, we let
+  \[
+    z_n \in \varprojlim \Z_p/p^n \Z_p.
+  \]
+  We define $a_i \in \{0, 1, \cdots, p - 1\}$ recursively such that
+  \[
+    x_n = \sum_{i = 0}^{n - 1} a_i p^i
+  \]
+  is the unique representative of $z_n$ in the set of integers $\{0, 1, \cdots, p^n - 1\}$. Then
+  \[
+    x = \sum_{i = 0}^\infty a_i p^i
+  \]
+  exists in $\Z_p$ and maps to $x \equiv x_n \equiv z_n \pmod{p^n}$ for all $n \geq 0$. So $\nu(x) = (z_n)$. So the map is surjective. So $\nu$ is bijective.
+\end{proof}
+
+\begin{cor}
+  Every $a \in \Z_p$ has a unique expansion
+  \[
+    a = \sum_{i = 0}^\infty a_i p^i.
+  \]
+  with $a_i \in \{0, \cdots, p - 1\}$.
+
+  More generally, for any $a \in \Q^\times$, there is a unique expansion
+  \[
+    a = \sum_{i = n}^\infty a_i p^i
+  \]
+  for $a_i \in \{0, \cdots, p - 1\}$, $a_n \not= 0$ and
+  \[
+    n = - \log_p |a|_p \in \Z.
+  \]
+\end{cor}
+
+\begin{proof}
+  The second part follows from the first part by multiplying $a$ by $p^{-n}$.
+\end{proof}
+
+\begin{eg}
+  We have
+  \[
+    \frac{1}{1 - p} = 1 + p + p^2 + p^3 + \cdots.
+  \]
+\end{eg}
+
+\section{Valued fields}
+\subsection{Hensel's lemma}
+We return to the discussion of general valued fields. We are now going to introduce an alternative to the absolute value that contains the same information, but is presented differently.
+\begin{defi}[Valuation]
+  Let $K$ be a field. A \term{valuation} on $K$ is a function $v: K \to \R \cup \{\infty\}$ such that
+  \begin{enumerate}
+    \item $v(x) = 0$ iff $x = 0$
+    \item $v(xy) = v(x) + v(y)$
+    \item $v(x + y) \geq \min\{v(x), v(y)\}$.
+  \end{enumerate}
+\end{defi}
+Here we use the conventions that $r + \infty = \infty$ and $r \leq \infty$ for all $r \in \infty$.
+
 In some sense, this definition is sort-of pointless, since if $v$ is a valuation, then the function
 \[
   |x| = c^{-v(x)}
@@ -2066,7 +2685,7 @@ This finishes the proof Mahler's theorem, and also finishes this section on $p$-
 From now on, the characteristic of the residue field of any local field will be denoted $p$, unless stated otherwise.
 
 \subsection{Ramification index and inertia degree}
-Suppose we have an extension $L/K$ of local fields. Then since $\mathfrak{m}_K \subseteq \mathfrak{m}_L$, and $\mathcal{O}_L \subseteq \mathcal{O}_L$, we obtain an injection
+Suppose we have an extension $L/K$ of local fields. Then since $\mathfrak{m}_K \subseteq \mathfrak{m}_L$, and $\mathcal{O}_K \subseteq \mathcal{O}_L$, we obtain an injection
 \[
   k_K = \frac{\mathcal{O}_K}{\mathfrak{m}_k} \hookrightarrow \frac{\mathcal{O}_L}{\mathfrak{m}_L} = k_L.
 \]
@@ -4379,3 +4998,8 @@ So we know that
 
 \printindex
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
